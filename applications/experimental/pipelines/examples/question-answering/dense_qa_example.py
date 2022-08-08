@@ -35,20 +35,23 @@ def dense_qa_pipeline():
             max_seq_len_passage=args.max_seq_len_passage,
             batch_size=args.retriever_batch_size,
             use_gpu=use_gpu,
-            embed_title=False, )
+            embed_title=False,
+        )
     else:
         doc_dir = "data/baike"
         city_data = "https://paddlenlp.bj.bcebos.com/applications/baike.zip"
         fetch_archive_from_http(url=city_data, output_dir=doc_dir)
-        dicts = convert_files_to_dicts(dir_path=doc_dir, split_paragraphs=True)
+        dicts = convert_files_to_dicts(dir_path=doc_dir,
+                                       split_paragraphs=True,
+                                       encoding='utf-8')
 
         if os.path.exists(args.index_name):
             os.remove(args.index_name)
         if os.path.exists(faiss_document_store):
             os.remove(faiss_document_store)
 
-        document_store = FAISSDocumentStore(
-            embedding_dim=768, faiss_index_factory_str="Flat")
+        document_store = FAISSDocumentStore(embedding_dim=768,
+                                            faiss_index_factory_str="Flat")
         document_store.write_documents(dicts)
 
         retriever = DensePassageRetriever(
@@ -59,7 +62,8 @@ def dense_qa_pipeline():
             max_seq_len_passage=args.max_seq_len_passage,
             batch_size=args.retriever_batch_size,
             use_gpu=use_gpu,
-            embed_title=False, )
+            embed_title=False,
+        )
 
         # update Embedding
         document_store.update_embeddings(retriever)
